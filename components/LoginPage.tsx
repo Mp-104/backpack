@@ -9,6 +9,7 @@ import { Button, Snackbar } from "react-native-paper";
 import { db, auth } from "./Firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { collection, query, where, getDocs } from "firebase/firestore/lite";
+import { router } from "expo-router";
 
 
 const LoginPage = () => {
@@ -108,6 +109,9 @@ const LoginPage = () => {
                     console.log("inloggad: ", username);
                     /*  alert("test")*/
                     setVisible(true); 
+
+                    // redirects to index.tsx
+                    router.replace("/(tabs)");
                 }
 
                 /* await signInWithEmailAndPassword(auth, username, password);
