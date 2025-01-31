@@ -8,7 +8,7 @@ import { Button, Snackbar } from "react-native-paper";
 
 import { db, auth } from "./Firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { collection, query, where, getDocs } from "firebase/firestore/lite";
+import { collection, query, where, getDocs, doc, getDoc, updateDoc } from "firebase/firestore/lite";
 import { router } from "expo-router";
 
 
@@ -18,10 +18,14 @@ const LoginPage = () => {
     const [visible, setVisible] = useState<boolean>(false);
     const [visible2, setVisible2] = useState<boolean>(false);
 
+
+    // fetches the user email if they provide a username, used when attempting to log in
     const getEmailbyUsername = async (username: string) => {
 
         try {
 
+            // upon registration, users credentials (email + username) are stored in firestore as an object, in a collection "users".
+            // this fetches the data of that collection and searches each one for the matching username. If found, returns the email associated with the provided username.
             const usersCollectionRef = collection(db, "users");
             const queryingUsers = query(usersCollectionRef, where("username", "==", username));
 
@@ -56,21 +60,25 @@ const LoginPage = () => {
             /* console.log("det är tomt");
             alert("tomt") */
             setVisible2(true);
+            
 
         } else {
 
             try{
                 let email = "";
+                let role = "";
 
                 if (username.includes("@")) {
 
                     email = username;
+                    role = "adult";
 
                 } else {
                     
                     const userEmail = await getEmailbyUsername(username);
 
                     email = userEmail;
+                    role = "minor";
 
                     console.log("userEmail: ", userEmail);
 
@@ -104,14 +112,50 @@ const LoginPage = () => {
 
                     const userCredential = await signInWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
+
+                    const userDocRef = doc(db, "users", user.uid);
+                    const userDoc = await getDoc(userDocRef);
+
+                    await updateDoc(doc(db, 'users', user.uid), {
+                        role: role,
+                    });
+
+
+                    // TODO :  why is there a signOut call in a login function? Because it ensures the role is updated properly before it renders
+                    // otherwise it shows outdated info upon redirecting the page with router.replace("/(tabs)");
+                    auth.signOut();
+
+                    const userCredential1 = await signInWithEmailAndPassword(auth, email, password);
+                    
+
+                    const updatedUserDoc = await getDoc(userDocRef);
+                    if (updatedUserDoc.exists()) {
+                        console.log("Updated userDoc data:", updatedUserDoc.data());
+                    }
+                    
+                    
+
+
+                    console.log("user.displayName: ", user.displayName);
+                    console.log("userDoc.data().email: ", userDoc.data().email)
+                    console.log("userDoc.data().username: ", userDoc.data().username)
+                    console.log("userDoc.data().role: ", userDoc.data().role)
+
                     console.log("User logged in!: ", user.displayName || user.email)
                     Alert.alert('Inloggad', `Välkommen, ${username}!`);
                     console.log("inloggad: ", username);
                     /*  alert("test")*/
                     setVisible(true); 
+                    setUsername("");
+                    setPassword("");
 
-                    // redirects to index.tsx
+                    // the below redericts to the index.tsx , 
                     router.replace("/(tabs)");
+
+                    // while this would redirect to explore.tsx  etc
+                    // router.replace("/(tabs)/explore") 
+
+                    //routeToScreen()
                 }
 
                 /* await signInWithEmailAndPassword(auth, username, password);
