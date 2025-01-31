@@ -1,11 +1,23 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { Image, StyleSheet, Platform, GestureResponderEvent, Button } from 'react-native';
 
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { auth } from '@/components/Firebase';
+import currentUser from '@/components/CurrentUser';
+import React from 'react';
 
 export default function HomeScreen() {
+
+  const user = currentUser().user;
+  const userData = currentUser().userData;
+
+  function handleLogout(event: GestureResponderEvent): void {
+    alert("this should log you out")
+    auth.signOut();
+  }
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -16,8 +28,10 @@ export default function HomeScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
+        <ThemedText type="title">Welcome! DisplayName: {user ? user.displayName : "Gäst"} Roll: {userData ? userData.role : ""} Username: {userData ? userData.username : ""}</ThemedText>
         <HelloWave />
+
+        {user ? (<Button title='Log out' onPress={handleLogout}></Button> ) : <></>}
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
@@ -30,6 +44,8 @@ export default function HomeScreen() {
               android: 'cmd + m',
               web: 'F12'
             })}
+
+            
           </ThemedText>{' '}
           to open developer tools.
         </ThemedText>
