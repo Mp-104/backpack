@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Platform, GestureResponderEvent, Button } from 'react-native';
+import { Image, StyleSheet, Platform, GestureResponderEvent, Button, Alert } from 'react-native';
 
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
@@ -7,6 +7,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { auth } from '@/components/Firebase';
 import currentUser from '@/components/CurrentUser';
 import React from 'react';
+import resetPassword from '@/components/PasswordReset';
 
 export default function HomeScreen() {
 
@@ -16,6 +17,12 @@ export default function HomeScreen() {
   function handleLogout(event: GestureResponderEvent): void {
     alert("this should log you out")
     auth.signOut();
+  }
+
+  function handleReset (event: GestureResponderEvent): void {
+
+    alert("this should send you a reset link")
+    resetPassword(user.email);
   }
 
   return (
@@ -28,12 +35,14 @@ export default function HomeScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome! DisplayName: {user ? user.displayName : "Gäst"} Roll: {userData ? userData.role : ""} Username: {userData ? userData.username : ""}</ThemedText>
+        <ThemedText type="title">Welcome! {user ? "DisplayName: " + user.displayName : "Gäst"} {user ? "Email: " + user.email : "Gäst"} {userData ? "Roll: " + userData.role : ""} {userData ? "Username: " + userData.username : ""}</ThemedText>
         <HelloWave />
 
-        {user ? (<Button title='Log out' onPress={handleLogout}></Button> ) : <></>}
+        
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
+        {user ? (<Button title='Log out' onPress={handleLogout}></Button> ) : <></>}
+        {user ? (<Button title='Återställ lösenord' onPress={handleReset}></Button> ) : <></>}
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
         <ThemedText>
           Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
