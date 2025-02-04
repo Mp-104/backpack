@@ -7,6 +7,7 @@ import { Button, Snackbar } from "react-native-paper";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, db } from "./Firebase";
 import { doc, setDoc } from "firebase/firestore/lite";
+import ImagePicker from "./ImagePicker";
 
 // To successfully register, or sign up, you need a properly typed email and password containing at least 6 characters, that is part of Firebase initial setup
 
@@ -45,6 +46,13 @@ const SignUp = () => {
                 displayName: displayName,
                 photoURL: photoURL,
             });
+
+            setUsername("");
+            setDisplayname("");
+            setEmail("");
+            setPassword("");
+            setPhotoURL("");
+            auth.signOut();
 
             console.log("user registered successfully");
           
@@ -91,6 +99,8 @@ const SignUp = () => {
                 onChangeText={setPhotoURL}
                 
             />
+
+            <ImagePicker onImageSelect={setPhotoURL}></ImagePicker>
 
             <TextInput
                 style={styles.input}

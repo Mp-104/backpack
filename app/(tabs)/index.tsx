@@ -41,6 +41,17 @@ export default function HomeScreen() {
         
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
+      {user && user.photoURL ? (
+          <Image
+            source={{ uri: user.photoURL }} // Use the user's photoURL as the source
+            style={styles.profileImage} // Apply your desired style here
+          />
+        ) : (
+          <Image
+            source={require('@/assets/images/partial-react-logo.png')} // Fallback image if no photoURL
+            style={styles.profileImage} // Same styling for the fallback image
+          />
+        )}
         {user ? (<Button title='Log out' onPress={handleLogout}></Button> ) : <></>}
         {user ? (<Button title='Återställ lösenord' onPress={handleReset}></Button> ) : <></>}
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
@@ -95,5 +106,12 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     position: 'absolute',
+  },
+  profileImage: {
+    width: 100,    // Set width of the profile image
+    height: 100,   // Set height of the profile image
+    borderRadius: 50, // Make it circular if desired
+    marginTop: 10, // Add some space between the name and photo
+    alignSelf: 'center', // Center the image
   },
 });
